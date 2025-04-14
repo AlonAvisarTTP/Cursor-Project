@@ -68,7 +68,7 @@ summary_intro = "🗓️ Here's your weekly reflection summary:\n\n"
 final_message = summary_intro + formatted_summary
 
 # הדפסה למסך
-print("\n📋 Summary for today:\n")
+print("\n📋 Summary for your week:\n")
 print(final_message)
 
 # שליחה לוואטסאפ
@@ -76,7 +76,7 @@ client_twilio = Client(os.getenv("TWILIO_ACCOUNT_SID"), os.getenv("TWILIO_AUTH_T
 client_twilio.messages.create(
     from_=os.getenv("TWILIO_PHONE_NUMBER"),
     to=os.getenv("RECIPIENT_PHONE_NUMBER"),
-    body="📋 Summary for today:\n\n" + final_message
+    body="📋 ummary for your week:\n\n" + final_message
 )
 
 print("✅ Summary sent via WhatsApp!")
