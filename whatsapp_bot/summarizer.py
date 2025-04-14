@@ -5,6 +5,7 @@ from dotenv import load_dotenv
 import gspread
 from oauth2client.service_account import ServiceAccountCredentials
 import openai
+from twilio.rest import Client
 
 load_dotenv()
 
@@ -13,13 +14,13 @@ scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/au
 credentials_json = os.getenv("GOOGLE_SHEET_CREDENTIALS_JSON")
 creds_dict = json.loads(credentials_json)
 creds = ServiceAccountCredentials.from_json_keyfile_dict(creds_dict, scope)
-client = gspread.authorize(creds)
+client_gs = gspread.authorize(creds)
 
 # הגדרות OpenAI
 openai.api_key = os.getenv("OPENAI_API_KEY")
 
 # קריאת הגיליון
-sheet = client.open("whatsapp_data").sheet1
+sheet = client_gs.open("whatsapp_data").sheet1
 rows = sheet.get_all_records()
 
 # שליפה רק של תשובות מהיום
@@ -52,10 +53,25 @@ Start your response with: "This day..."
 
 # בקשת סיכום מ-OpenAI
 response = openai.ChatCompletion.create(
-    model="gpt-4",
+    model="gpt-3.5-turbo",
     messages=[{"role": "user", "content": prompt}]
 )
 
 summary = response["choices"][0]["message"]["content"]
+
+# עיצוב – ירידת שורה אחרי כל נקודה
+formatted_summary = summary.replace(". ", ".\n")
+
+# הדפסה למסך
 print("\n📋 Summary for today:\n")
-print(summary)
+print(formatted_summary)
+
+# שליחה לוואטסאפ
+client_twilio = Client(os.getenv("TWILIO_ACCOUNT_SID"), os.getenv("TWILIO_AUTH_TOKEN"))
+client_twilio.messages.create(
+    from_=os.getenv("TWILIO_PHONE_NUMBER"),
+    to=os.getenv("RECIPIENT_PHONE_NUMBER"),
+    body="📋 Summary for today:\n\n" + formatted_summary
+)
+
+print("✅ Summary sent via WhatsApp!")
