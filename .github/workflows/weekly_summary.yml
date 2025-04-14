@@ -30,4 +30,3 @@ jobs:
           RECIPIENT_PHONE_NUMBER: ${{ secrets.RECIPIENT_PHONE_NUMBER }}
         run: python whatsapp_bot/summarizer.py
  
- print("🧠 Weekly summary ran on schedule.")

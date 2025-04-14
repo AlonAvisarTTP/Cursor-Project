@@ -80,3 +80,4 @@ client_twilio.messages.create(
 )
 
 print("✅ Summary sent via WhatsApp!")
+print("🧠 Weekly summary ran on schedule.")
