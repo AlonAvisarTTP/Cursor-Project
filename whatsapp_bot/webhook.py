@@ -2,12 +2,11 @@ import os
 from flask import Flask, request
 from dotenv import load_dotenv
 from datetime import datetime
-import json
+import gspread
+from oauth2client.service_account import ServiceAccountCredentials
 
 app = Flask(__name__)
 load_dotenv()
-
-RESPONSES_FILE = "data/answers.json"
 
 @app.route("/", methods=["GET"])
 def index():
@@ -17,23 +16,19 @@ def index():
 def whatsapp():
     incoming_msg = request.form.get('Body')
     sender = request.form.get('From')
-
     now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    entry = {"timestamp": now, "sender": sender, "message": incoming_msg}
 
-    os.makedirs("data", exist_ok=True)
-
-    if not os.path.exists(RESPONSES_FILE):
-        with open(RESPONSES_FILE, "w") as f:
-            json.dump([], f)
-
-    with open(RESPONSES_FILE, "r+") as f:
-        try:
-            data = json.load(f)
-        except json.JSONDecodeError:
-            data = []
-        data.append(entry)
-        f.seek(0)
-        json.dump(data, f, indent=2)
+    print(f"Received from {sender}: {incoming_msg}")
+    
+    # שמירה לגיליון עם פונקציה חיצונית
+    save_to_google_sheet(now, sender, "", incoming_msg)
 
     return "OK", 200
+
+def save_to_google_sheet(timestamp, sender, question, answer):
+    scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
+    creds = ServiceAccountCredentials.from_json_keyfile_name("google_sheet_credentials.json", scope)
+    client = gspread.authorize(creds)
+
+    sheet = client.open("whatsapp_data").sheet1
+    sheet.append_row([timestamp, sender, question, answer])
