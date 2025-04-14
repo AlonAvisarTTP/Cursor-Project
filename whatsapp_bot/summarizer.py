@@ -24,12 +24,15 @@ sheet = client_gs.open("whatsapp_data").sheet1
 rows = sheet.get_all_records()
 
 # שליפה רק של תשובות מהיום
-today = datetime.now().date()
+today = datetime.now()
+start_of_week = today - timedelta(days=today.weekday())  # יום ראשון
+end_of_week = start_of_week + timedelta(days=4)          # יום חמישי
+
 relevant_rows = []
 for row in rows:
     try:
         row_time = datetime.strptime(row["Timestamp"], "%Y-%m-%d %H:%M:%S")
-        if row_time.date() == today and row["Answer"]:
+        if start_of_week.date() <= row_time.date() <= end_of_week.date() and row["Answer"]:
             relevant_rows.append(row)
     except:
         continue
@@ -61,17 +64,19 @@ summary = response["choices"][0]["message"]["content"]
 
 # עיצוב – ירידת שורה אחרי כל נקודה
 formatted_summary = summary.replace(". ", ".\n")
+summary_intro = "🗓️ Here's your weekly reflection summary:\n\n"
+final_message = summary_intro + formatted_summary
 
 # הדפסה למסך
 print("\n📋 Summary for today:\n")
-print(formatted_summary)
+print(final_message)
 
 # שליחה לוואטסאפ
 client_twilio = Client(os.getenv("TWILIO_ACCOUNT_SID"), os.getenv("TWILIO_AUTH_TOKEN"))
 client_twilio.messages.create(
     from_=os.getenv("TWILIO_PHONE_NUMBER"),
     to=os.getenv("RECIPIENT_PHONE_NUMBER"),
-    body="📋 Summary for today:\n\n" + formatted_summary
+    body="📋 Summary for today:\n\n" + final_message
 )
 
 print("✅ Summary sent via WhatsApp!")
