@@ -1,52 +1,52 @@
-# WhatsApp Daily Reflection Bot
+# 📱 WhatsApp Daily Reflection Bot
 
-This script sends daily WhatsApp messages using Twilio and saves the responses to a JSON file.
+An AI-powered WhatsApp bot that asks you reflective questions each evening and sends you a beautiful weekly summary every Friday.
 
-## Setup
+## ✨ Features
 
-1. Install the required dependencies:
-```bash
-pip install -r requirements.txt
-```
+- 📅 Sends you a daily question every evening at 21:30
+- 💬 Handles your answers in natural conversation flow
+- 📊 Saves all data to Google Sheets
+- 🧠 Uses OpenAI to generate emotional weekly summaries
+- 💌 Sends the summary back to you via WhatsApp every Friday at 16:00
 
-2. Create a Twilio account and get your credentials:
-   - Sign up at https://www.twilio.com/
-   - Get your Account SID and Auth Token
-   - Set up a WhatsApp Sandbox for your Twilio number
+## 🛠 Tech Stack
 
-3. Copy the `.env.example` file to `.env` and fill in your credentials:
-```bash
-cp .env.example .env
-```
+- Python
+- Twilio (WhatsApp API)
+- OpenAI (GPT-3.5)
+- Google Sheets (via `gspread`)
+- GitHub Actions (for scheduling)
 
-4. Edit the `.env` file with your Twilio credentials and phone numbers:
-   - `TWILIO_ACCOUNT_SID`: Your Twilio Account SID
-   - `TWILIO_AUTH_TOKEN`: Your Twilio Auth Token
-   - `TWILIO_PHONE_NUMBER`: Your Twilio phone number (with country code)
-   - `RECIPIENT_PHONE_NUMBER`: The recipient's phone number (with country code)
+## 🔄 How It Works
 
-## Usage
+1. Every day at 21:30:
+   - Bot sends: “Hi Alon, what was your best moment today?”
+   - After reply: “Tell me briefly about an inspiration you had today”
+2. All answers are stored in a Google Sheet
+3. Every Friday at 16:00:
+   - The bot collects all answers from Sunday to Thursday
+   - It generates a short emotional summary using GPT
+   - Sends it to you on WhatsApp
 
-Run the script:
-```bash
-python main.py
-```
+## 🔐 Environment Variables
 
-The script will:
-1. Send the first message ("Hi Alon, what was your best moment today?") every day at 21:30 from Sunday to Thursday
-2. Wait for the response
-3. Send the second message ("Tell me briefly about an inspiration you had today")
-4. Save both responses to `responses.json` with the date
+Set these as GitHub Actions secrets:
 
-## Responses Format
+- `TWILIO_ACCOUNT_SID`
+- `TWILIO_AUTH_TOKEN`
+- `TWILIO_PHONE_NUMBER`
+- `RECIPIENT_PHONE_NUMBER`
+- `OPENAI_API_KEY`
+- `GOOGLE_SHEET_CREDENTIALS_JSON`
 
-The responses are saved in `responses.json` with the following format:
-```json
-[
-    {
-        "date": "YYYY-MM-DD",
-        "best_moment": "Response to first question",
-        "inspiration": "Response to second question"
-    }
-]
-``` 
+
+## ✅ Setup Status
+
+- [x] Fully deployed in the cloud
+- [x] Zero-cost using GitHub Actions
+- [x] Sends and receives messages
+- [x] Summarizes using GPT
+- [x] Logs to Google Sheets
+
+Built by Alon Avisar ❤️
