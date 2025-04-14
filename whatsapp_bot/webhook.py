@@ -4,6 +4,8 @@ from dotenv import load_dotenv
 from datetime import datetime
 import gspread
 from oauth2client.service_account import ServiceAccountCredentials
+import json
+from io import StringIO
 
 app = Flask(__name__)
 load_dotenv()
@@ -27,7 +29,13 @@ def whatsapp():
 
 def save_to_google_sheet(timestamp, sender, question, answer):
     scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
-    creds = ServiceAccountCredentials.from_json_keyfile_name("google_sheet_credentials.json", scope)
+    
+    # קריאת האישורים מהסביבה
+    credentials_json = os.getenv("GOOGLE_SHEET_CREDENTIALS_JSON")
+    creds_dict = json.loads(credentials_json)
+    creds_file = StringIO(json.dumps(creds_dict))
+    
+    creds = ServiceAccountCredentials.from_json_keyfile_dict(creds_dict, scope)
     client = gspread.authorize(creds)
 
     sheet = client.open("whatsapp_data").sheet1
